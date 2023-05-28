@@ -2,14 +2,17 @@
 #include <string>
 #include <map>
 #include <vector>
+#include <fstream>
+#include <ctime>
+#include <cstdlib>
 using namespace std;
 
-const string PALAVRA_SECRETA = "MELANCIA"; 
+string palavra_secreta = "MELANCIA"; 
 map<char, bool> chutou;
 vector<char> chutes_errados;
 
 bool letra_existe(char chute){
-    for(char letra : PALAVRA_SECRETA){
+    for(char letra : palavra_secreta){
         if(chute == letra){
             return true;
         }
@@ -18,7 +21,7 @@ bool letra_existe(char chute){
 }
 
 bool nao_acertou(){
-    for(char letra : PALAVRA_SECRETA){
+    for(char letra : palavra_secreta){
         if(!chutou[letra]){
             return true;
         }
@@ -46,7 +49,7 @@ void imprime_erros(){
 }
 
 void imprime_palavra(){
-    for(char letra : PALAVRA_SECRETA){
+    for(char letra : palavra_secreta){
         if(chutou[letra]){
             cout << letra << " ";
         }
@@ -74,8 +77,39 @@ void chuta(){
     cout << endl;
 }
 
+vector<string> le_arquivo() {
+    ifstream arquivo;
+    arquivo.open("palavras.txt");
+
+    int quantidade_palavras;
+    arquivo >> quantidade_palavras;
+
+    vector<string> palavras_do_arquivo;
+
+    for(int i = 0; i < quantidade_palavras; i++) {
+        string palavra_lida;
+        arquivo >> palavra_lida;
+        palavras_do_arquivo.push_back(palavra_lida);
+    }
+
+    return palavras_do_arquivo;
+
+}
+
+void sorteia_palavra() {
+    vector<string> palavras = le_arquivo();
+
+    srand(time(NULL));
+    int indice_sorteio = rand() % palavras.size();
+
+    palavra_secreta = palavras[indice_sorteio];
+}
+
 int main () {
     imprime_cabecalho();
+
+    le_arquivo();
+    sorteia_palavra();
 
     while(nao_acertou() && nao_enforcou()){
         imprime_erros();
@@ -86,7 +120,7 @@ int main () {
     }
 
     cout << "Fim de jogo!" << endl;
-    cout << "A palavra secreta era: " << PALAVRA_SECRETA << endl;
+    cout << "A palavra secreta era: " << palavra_secreta << endl;
     if(nao_acertou()){
         cout << "Você perdeu! Tente novamente!" << endl;
     }
